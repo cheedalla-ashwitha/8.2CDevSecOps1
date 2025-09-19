@@ -1,66 +1,80 @@
 pipeline {
     agent any
+
+    // Auto-trigger on a schedule (no webhook required)
+    triggers {
+        pollSCM('H/5 * * * *')
+    }
+
     stages {
         stage('Build') {
             steps {
-                echo 'Stage 1: Build - Building with Maven'
-                echo 'Tool: Maven (mvn clean package)'
-                echo 'Task: Compile and package the application'
+                echo 'Stage 1: Build'
+                echo 'Tool: Maven'
+                echo 'Task: Compile and package the application (mvn clean package)'
             }
         }
-        
+
         stage('Unit and Integration Tests') {
             steps {
                 echo 'Stage 2: Unit and Integration Tests'
-                echo 'Tools: JUnit, TestNG, Jest'
-                echo 'Task: Run unit tests and integration tests'
+                echo 'Tool: JUnit'
+                echo 'Task: Execute unit tests and basic integration tests'
             }
         }
-        
+
         stage('Code Analysis') {
             steps {
                 echo 'Stage 3: Code Analysis'
-                echo 'Tool: SonarQube'
-                echo 'Task: Analyze code quality and standards compliance'
+                echo 'Tool: SonarQube (local instance)'
+                echo 'Task: Analyze code quality, maintainability, and coding standards'
             }
         }
-        
+
+        stage('SonarCloud Analysis') {
+            steps {
+                echo 'Stage 3b: SonarCloud Analysis'
+                echo 'Tool: SonarCloud with Jenkins credentials (SONAR_TOKEN)'
+                echo 'Task: Upload code analysis results and coverage reports to SonarCloud dashboard'
+            }
+        }
+
         stage('Security Scan') {
             steps {
                 echo 'Stage 4: Security Scan'
-                echo 'Tool: OWASP Dependency Check'
-                echo 'Task: Scan for security vulnerabilities'
+                echo 'Tool: OWASP Dependency-Check'
+                echo 'Task: Scan project dependencies for known vulnerabilities (CVEs)'
             }
         }
-        
+
         stage('Deploy to Staging') {
             steps {
                 echo 'Stage 5: Deploy to Staging'
-                echo 'Tool: AWS CLI, Docker'
-                echo 'Task: Deploy application to staging environment'
+                echo 'Tool: AWS CLI'
+                echo 'Task: Deploy the application artifact to a staging environment (e.g., EC2)'
             }
         }
-        
+
         stage('Integration Tests on Staging') {
             steps {
                 echo 'Stage 6: Integration Tests on Staging'
-                echo 'Tools: Selenium, Postman/Newman'
-                echo 'Task: Run tests in production-like environment'
+                echo 'Tool: Selenium'
+                echo 'Task: Run end-to-end tests against the staging environment'
             }
         }
-        
+
         stage('Deploy to Production') {
             steps {
                 echo 'Stage 7: Deploy to Production'
-                echo 'Tool: AWS CLI, Kubernetes'
-                echo 'Task: Deploy application to production environment'
+                echo 'Tool: Kubernetes (kubectl)'
+                echo 'Task: Roll out the new version to the production cluster'
             }
         }
     }
-    
+
     post {
         always {
-            echo 'Pipeline completed - all 7 stages executed'
+            echo 'Pipeline completed - all 8 stages executed'
         }
         success {
             echo 'Pipeline succeeded!'
