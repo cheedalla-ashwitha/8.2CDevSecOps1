@@ -1,0 +1,28 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]      # change if your default branch is not 'main'
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  sonarqube:
+    name: SonarCloud Analysis
+    runs-on: ubuntu-latest   # recommended; simpler than Windows for Sonar scans
+    steps:
+      - name: Checkout (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0     # required for better analysis
+
+      # Optional: set up Node.js if your project uses npm
+      # - uses: actions/setup-node@v4
+      #   with:
+      #     node-version: '18'
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
